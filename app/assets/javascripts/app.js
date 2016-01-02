@@ -1,7 +1,5 @@
-angular.module('koko', ['ui.router','templates','Devise'])
-// .config(function(AuthInterceptProvider){
-// 	AuthInterceptProvider.interceptAuth(true);
-// })
+angular.module('koko', ['ui.router','templates','firebase'])
+.constant('ROOTURL','https://kokoparking.firebaseio.com')
 .config([
 	'$stateProvider',
 	'$urlRouterProvider',
@@ -11,28 +9,54 @@ angular.module('koko', ['ui.router','templates','Devise'])
 		.state('home',{
 			url:'/home',
 			templateUrl:'home/_home.html',
-			controller:'MainCtrl'
+			controller:'MainCtrl',
+			controllerAs:'main'
 		})
 		.state('login',{
 			url:'/login',
 			templateUrl:'auth/_login.html',
 			controller:'AuthCtrl',
-			onEnter:['$state', 'Auth', function($state, Auth){
-				if(Auth.isAuthenticated()){
-					Auth.currentUser().then(function(){
-						$state.go('home');
-					});
-				}
+			controllerAs:'auth',
+			onEnter:['$state','AuthService',function($state, AuthService){
+				AuthService.errors=[];
+				if(AuthService.currentUser){
+					$state.go('home');
+				}				
 			}]
 		})
 		.state('register',{
 			url:'/register',
 			templateUrl:'auth/_register.html',
 			controller:'AuthCtrl',
-			onEnter:['$state', 'Auth', function($state, Auth){
-				Auth.currentUser().then(function(){
+			controllerAs:'auth',
+			onEnter:['$state','AuthService',function($state, AuthService){
+				AuthService.errors=[];
+				if(AuthService.currentUser){
 					$state.go('home');
-				})
+				}
+			}]
+		})
+		.state('resetPassword',{
+			url:'/resetPassword',
+			templateUrl:'auth/_resetPassword.html',
+			controller:'AuthCtrl',
+			controllerAs:'auth',
+			onEnter:['$state','AuthService',function($state, AuthService){
+				AuthService.errors=[];
+				if(!AuthService.currentUser){
+					$state.go('home');
+				}
+			}]
+		})
+		.state('profile',{
+			url:'/profile',
+			templateUrl:'profile/_index.html',
+			controller:'ProfileCtrl',
+			controllerAs:'profile',
+			onEnter:['$state','AuthService',function($state, AuthService){
+				if(!AuthService.currentUser){
+					$state.go('home');
+				}
 			}]
 		});
 

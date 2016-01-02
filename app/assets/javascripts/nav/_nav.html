@@ -1,9 +1,9 @@
-<nav class="nav navbar-default" ng-controller="NavCtrl">
+<nav class="nav navbar-default" ng-controller="NavCtrl as nav">
 	<ul class="nav navbar-nav">
-		<li><a href="#/home">Home</a></li>
-		<li ng-hide="signedIn()"><a href="#/login">Login</a></li>
-		<li ng-hide="signedIn()"><a href="#/register">Register</a></li>
-		<li ng-show="signedIn()"><a href="#">{{user.username}}</a></li>
-		<li ng-show="signedIn()"><a ng-click="logout()">Logout</a></li>
+		<li><a href="#">Home</a></li>
+		<li><a ng-hide="nav.currentUser" href="#/login">Login</a></li>
+		<li><a ng-hide="nav.currentUser" href="#/register">Register</a></li>
+		<li><a ng-show="nav.currentUser" href="#/profile">{{nav.currentUser}}</a></li>
+		<li><a ng-show="nav.currentUser" href="#" ng-click="nav.logout()">Logout</a></li>
 	</ul>
 </nav>

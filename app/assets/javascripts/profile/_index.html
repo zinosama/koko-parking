@@ -1,0 +1,35 @@
+<h1>Welcome, {{profile.currentUser}}</h1>
+<button class="btn btn-primary btn-block" ng-click="profile.toggle('#accountSettingDiv')" style="margin-bottom:1em;">Account Setting</button> 
+<div id="accountSettingDiv" class="hide">
+
+	<button class="btn btn-default btn-block" ng-click="profile.toggle('#changePasswordDiv')">Change Password</button>
+	<div id="changePasswordDiv" class="hide">
+		<div class="error" ng-repeat="error in profile.errors">
+		  <p>{{error}}</p>
+		</div>
+		<form ng-submit="profile.changePassword()">
+			<ng-include src="'profile/_changePasswordForm.html'"></ng-include>
+		</form>
+	</div>
+
+	<button class="btn btn-default btn-block" ng-click="profile.toggle('#changeEmailDiv')">Change Email</button>
+	<div id="changeEmailDiv" class="hide">
+		<div class="error" ng-repeat="error in profile.errors">
+		  <p>{{error}}</p>
+		</div>
+		<form ng-submit="profile.changeEmail()">
+			<ng-include src="'profile/_changeEmailForm.html'"></ng-include>
+		</form>
+	</div>
+
+	<button class="btn btn-danger btn-block" ng-click="profile.toggle('#removeUserDiv')">Delete Account</button>
+	<div id="removeUserDiv" class="hide">
+		<div class="error" ng-repeat="error in profile.errors">
+		  <p>{{error}}</p>
+		</div>
+		<form ng-submit="profile.removeUser()">
+			<ng-include src="'profile/_removeUserForm.html'"></ng-include>
+		</form>
+	</div>
+</div>
+	

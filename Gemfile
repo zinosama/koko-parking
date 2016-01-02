@@ -18,7 +18,7 @@ gem 'angular_rails_csrf'
 # This is not the latest version because the latest version generates errors with angular-rails-templates
 gem 'sprockets', '~>2.12.3'
 gem 'angular-rails-templates'
-gem 'devise'
+gem 'responders', '~> 2.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

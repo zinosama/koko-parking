@@ -2,13 +2,18 @@
 	<h1>Log In</h1>
 </div>
 
-<form ng-submit="login()">
+<div class="error" ng-repeat="error in auth.errors">
+  <p>{{error}}</p>
+</div>
+
+<form ng-submit="auth.login()">
 	<div class="input-group">
-		<input type="email" class="form-control" placeholder="Email" ng-model="user.email">
+		<input type="email" class="form-control" placeholder="Email" ng-model="auth.newUser.email">
 	</div>
 
 	<div class="input-group">
-		<input type="text" class="form-control" placeholder="Password" ng-model="user.password">
+		<input type="text" class="form-control" placeholder="Password" ng-model="auth.newUser.password">
 	</div>
 	<input type="submit" class="btn btn-default" value="Log In">
 </form>
+<a href="#/resetPassword">Forgot Password?</a>

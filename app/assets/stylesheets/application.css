@@ -11,6 +11,7 @@
  * file per style scope.
  *
  *= require bootstrap/dist/css/bootstrap
+ *= require sweetalert
  *= require_tree .
  *= require_self
  */
