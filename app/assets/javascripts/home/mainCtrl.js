@@ -1,10 +1,15 @@
-function MainCtrl(AuthService){
+function MainCtrl(AuthService, MapService){
+	var that = this;
+
 	this.currentUser=AuthService.currentUser;
-	var that=this;
 	var updateCurrentUserM = function mainUserObserver(){
 		that.currentUser = AuthService.currentUser;
 	};
 	AuthService.registerObserverCallback(updateCurrentUserM);
+
+
+
+
 }
 
 angular.module('koko')
