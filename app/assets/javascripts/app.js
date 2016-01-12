@@ -10,7 +10,7 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			url:'/home',
 			templateUrl:'home/_home.html',
 			controller:'MainCtrl',
-			controllerAs:'main'
+			controllerAs:'main',
 		})
 		.state('login',{
 			url:'/login',
@@ -53,6 +53,17 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			templateUrl:'profile/_index.html',
 			controller:'ProfileCtrl',
 			controllerAs:'profile',
+			onEnter:['$state','AuthService',function($state, AuthService){
+				if(!AuthService.currentUser){
+					$state.go('home');
+				}
+			}]
+		})
+		.state('newListing',{
+			url:'/newListing',
+			templateUrl:'listing/_newListing.html',
+			controller:'ListingCtrl',
+			controllerAs:'listing',
 			onEnter:['$state','AuthService',function($state, AuthService){
 				if(!AuthService.currentUser){
 					$state.go('home');

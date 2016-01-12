@@ -3,6 +3,7 @@
 		<li><a href="#">Home</a></li>
 		<li><a ng-hide="nav.currentUser" href="#/login">Login</a></li>
 		<li><a ng-hide="nav.currentUser" href="#/register">Register</a></li>
+		<li><a ng-show="nav.currentUser" href="#/newListing">Create Listing</a></li>
 		<li><a ng-show="nav.currentUser" href="#/profile">{{nav.currentUser}}</a></li>
 		<li><a ng-show="nav.currentUser" href="#" ng-click="nav.logout()">Logout</a></li>
 	</ul>

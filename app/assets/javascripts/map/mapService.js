@@ -1,20 +1,28 @@
 function MapService($window){
-	var map;
-	var geoMarker;
-	var location = {lat: -34.397, lng: 150.644};//default map center
+	var newEl = document.createElement('div');
+	newEl.style.width = "80%";
+	newEl.style.height = "300px";
+	var map, geoMarker, addressMarker;
+	var location;
+	var mapReady = false;
+
+	var mapCallbacks = [];
+	var notifyMapCallbacks = function(){
+		angular.forEach(mapCallbacks, function(callback){
+			callback();
+		});
+		mapCallbacks = [];
+	};
 
 	function onload(position){
 		if(map){//if google map loads before geolocation, modify map object
-			map.setCenter({
-				lat:position.coords.latitude,
-				lng:position.coords.longitude
-			});
-			geoMarker.setPosition({
-				lat:position.coords.latitude,
-				lng:position.coords.longitude
-			});
+			location = {lat:position.coords.latitude, lng:position.coords.longitude};
+			map.setCenter(location);
+
+		 	mapReady = true; //map and geolocation both finished
+		 	if(mapCallbacks.length) notifyMapCallbacks();
 		}else{
-			location = position;
+			location = {lat:position.coords.latitude, lng:position.coords.longitude};
 		}
 	};
 
@@ -22,35 +30,66 @@ function MapService($window){
 		console.error(error);
 	});
 
-	//How to avoid polluting global namespace?
 	$window.initMap = function(){
-		var styles = [{"featureType":"landscape","stylers":[{"hue":"#FFBB00"},{"saturation":43.400000000000006},{"lightness":37.599999999999994},{"gamma":1}]},{"featureType":"road.highway","stylers":[{"hue":"#FFC200"},{"saturation":-61.8},{"lightness":45.599999999999994},{"gamma":1}]},{"featureType":"road.arterial","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":51.19999999999999},{"gamma":1}]},{"featureType":"road.local","stylers":[{"hue":"#FF0300"},{"saturation":-100},{"lightness":52},{"gamma":1}]},{"featureType":"water","stylers":[{"hue":"#0078FF"},{"saturation":-13.200000000000003},{"lightness":2.4000000000000057},{"gamma":1}]},{"featureType":"poi","stylers":[{"hue":"#00FF6A"},{"saturation":-1.0989010989011234},{"lightness":11.200000000000017},{"gamma":1}]}];
+		map = new google.maps.Map(newEl,{
+			center: location || {lat: 85.7064218, lng: -74.0091584},
+			zoom:16,
+			styles:[{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2e5d4"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{"featureType":"road","elementType":"all","stylers":[{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]}],
+			mapTypeControl:false
+		});
 
-	  map = new google.maps.Map(document.getElementById('map'), {
-	    center: location,
-	    zoom: 16,
-	    mapTypeControl:false,
-	    styles: styles
-	  });
-
-	 	geoMarker = new google.maps.Marker({
-	 		position:location,
-	 		map:map,
-	 		title:"Hello World!"
-	 	});
+		if(location){
+		 	mapReady=true; //map and geolocation both finished
+		 	if(mapCallbacks.length) notifyMapCallbacks();
+		}
 	};
 
-	// var mapCallbacks = [];
-	// var notifyMapCallbacks = function(){
-	// 	angular.forEach(mapCallbacks, function(callback){
-	// 		callback();
-	// 	});
-	// };
+	var MapService = {};
 
-	// var MapService = {};
-	// MapService.registerCallback = function(callback){
-	// 	mapCallbacks.push(callback);
-	// };
+	MapService.getMapEl = function(){
+		return newEl;
+	};
+
+	MapService.getMap = function(){
+		return map;
+	}
+	MapService.isMapReady = function(){
+		return mapReady;
+	};
+
+	MapService.appendMap = function(){
+	 	geoMarker = new google.maps.Marker({
+	 		position:location,
+	 		map:map
+	 	});
+		document.querySelector("#mapDiv").appendChild(newEl);
+	};
+
+	MapService.getLocation = function(){
+		return location;
+	}
+
+	MapService.registerCallback = function(callback){
+		mapCallbacks.push(callback);
+	};
+
+	MapService.geocodeAddress = function(geocoder, map, address){
+		var options = {
+			'address': address,
+			'region': 'US'
+		};
+		geocoder.geocode(options,function(results, status){
+			if(status === google.maps.GeocoderStatus.OK){	
+				map.setCenter(results[0].geometry.location);
+				addressMarker = new google.maps.Marker({
+					map: map,
+					position: results[0].geometry.location
+				});
+			}else{
+				console.error(status);
+			}
+		});
+	};
 
 	return MapService;
 };
