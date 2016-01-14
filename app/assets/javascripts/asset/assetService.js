@@ -18,6 +18,10 @@ function AssetService(AuthService, $http){
 
 	var AssetService={};
 
+	AssetService.loadSpots = function(listingId){
+		return $http.get('/listings/'+listingId+'/spots')
+	};
+
 	AssetService.loadListings = function(){
 		var fire_ref = AuthService.getUid();
 		$http.get('/listings?fire_ref='+fire_ref)
@@ -39,6 +43,17 @@ function AssetService(AuthService, $http){
 	AssetService.registerCallback = function(callback){
 		deleteRepeatObserver(callback);
 		callbacks.push(callback);
+	};
+
+	AssetService.verifyListingAccess = function(listingId){
+		var i;
+		listingId = parseInt(listingId, 10);
+		for(i=0; i<listings.length; i++){
+			if(listings[i].id === listingId){
+				return true;
+			}
+		}
+		return false;
 	};
 
 	return AssetService;

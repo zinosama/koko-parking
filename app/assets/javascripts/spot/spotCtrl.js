@@ -1,4 +1,5 @@
-function SpotCtrl($stateParams, MapService){ //MapSerivce is introduced so that map will always load upon refresh
+function SpotCtrl($stateParams, MapService, spots){ //MapSerivce is introduced so that map will always load upon refresh
+	this.spots = spots;
 	this.listingId = $stateParams.listingId;
 };
 

@@ -74,9 +74,30 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			url:'/listings/:listingId/spots',
 			templateUrl:'spot/_index.html',
 			controller:'SpotCtrl',
-			controllerAs:'spot'
+			controllerAs:'spot',
+			resolve:{
+				spots: function(AssetService, $stateParams){
+					if(AssetService.verifyListingAccess($stateParams.listingId)){
+						return AssetService.loadSpots($stateParams.listingId)
+						.then(function(response){
+							console.log(response);
+							return response.data.spots;
+						})
+						.catch(function(response){
+							console.error(response.data.errors);
+							return response.data.errors;
+						});
+					}else{
+						return {error:"Unauthorized"};
+					}
+				}
+			},
+			onEnter:['$state','spots',function($state, spots){
+				if(spots.error && spots.error === "Unauthorized"){
+					$state.go('profile');
+				}
+			}]
 		});
-		;
 
 		$urlRouterProvider.otherwise('home');
 	}]);
