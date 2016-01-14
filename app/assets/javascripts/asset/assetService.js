@@ -35,6 +35,9 @@ function AssetService(AuthService, $http){
 	};
 	
 	AssetService.loadListings();
+	AssetService.setListings = function(input){
+		listings = input;
+	}
 
 	AssetService.getListings = function(){
 		return listings;

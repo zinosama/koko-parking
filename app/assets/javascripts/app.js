@@ -53,9 +53,21 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			templateUrl:'profile/_index.html',
 			controller:'ProfileCtrl',
 			controllerAs:'profile',
-			onEnter:['$state','AuthService',function($state, AuthService){
-				if(!AuthService.currentUser){
+			resolve:{
+				currentAuth: function(AuthService){
+					return AuthService.waitForAuth()
+					.then(function(authObj){
+						if(authObj){
+							AuthService.setUid(authObj.uid);
+							return authObj;
+						}
+					})
+				}
+			},
+			onEnter:['$state', 'currentAuth', function($state, currentAuth){
+				if(!currentAuth){
 					$state.go('home');
+				}else{
 				}
 			}]
 		})
@@ -64,9 +76,21 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			templateUrl:'listing/_new.html',
 			controller:'ListingCtrl',
 			controllerAs:'listing',
-			onEnter:['$state','AuthService',function($state, AuthService){
-				if(!AuthService.currentUser){
+			resolve:{
+				currentAuth: function(AuthService){
+					return AuthService.waitForAuth()
+					.then(function(authObj){
+						if(authObj){
+							AuthService.setUid(authObj.uid);
+							return authObj;
+						}
+					})
+				}
+			},
+			onEnter:['$state', 'currentAuth', function($state, currentAuth){
+				if(!currentAuth){
 					$state.go('home');
+				}else{
 				}
 			}]
 		})
@@ -76,24 +100,47 @@ angular.module('koko', ['ui.router','templates','firebase'])
 			controller:'SpotCtrl',
 			controllerAs:'spot',
 			resolve:{
-				spots: function(AssetService, $stateParams){
+				currentAuth: function(AuthService, MapService){
+					return AuthService.waitForAuth()
+					.then(function(authObj){
+						AuthService.setUid(authObj.uid);
+						return authObj;
+					});
+				},
+				load: function($http, currentAuth){
+					if(currentAuth){
+						return $http.get('/listings?fire_ref='+currentAuth.uid)
+						.then(function(message){
+							return message.data.listings;
+						})
+						.catch(function(error){
+							return {error: error};
+						});
+					}
+				},
+				spots: function(AssetService, $stateParams, currentAuth, load){
+					AssetService.setListings(load);
 					if(AssetService.verifyListingAccess($stateParams.listingId)){
 						return AssetService.loadSpots($stateParams.listingId)
 						.then(function(response){
-							console.log(response);
 							return response.data.spots;
 						})
 						.catch(function(response){
-							console.error(response.data.errors);
-							return response.data.errors;
+							return {error: response.data.errors};
 						});
 					}else{
 						return {error:"Unauthorized"};
 					}
 				}
 			},
-			onEnter:['$state','spots',function($state, spots){
-				if(spots.error && spots.error === "Unauthorized"){
+			onEnter:['$state','spots','currentAuth', 'load', function($state, spots, load, currentAuth){
+				if(!currentAuth){
+					$state.go('login');
+				}else if(load.error){
+					console.error(load.error);
+					$state.go('profile');
+				}else if(spots.error && spots.error === "Unauthorized"){
+					console.error(spots.error);
 					$state.go('profile');
 				}
 			}]

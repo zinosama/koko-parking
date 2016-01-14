@@ -57,6 +57,10 @@ function AuthService($firebaseAuth, $firebaseObject, $state, $http){
 
 	AuthServiceObj.errors = [];
 
+	AuthServiceObj.waitForAuth = function(){
+		return auth.$waitForAuth();
+	}
+
 	AuthServiceObj.clearErrors = function(){
 		AuthServiceObj.errors = [];
 		notifyObservers();
@@ -95,7 +99,11 @@ function AuthService($firebaseAuth, $firebaseObject, $state, $http){
 
 	AuthServiceObj.getUid = function(){
 		return currentUserUid;
-	}
+	};
+
+	AuthServiceObj.setUid = function(uid){
+		currentUserUid = uid;
+	};
 
 	AuthServiceObj.login = function(newUser){
 		auth.$authWithPassword(newUser)

@@ -1,4 +1,4 @@
-function ProfileCtrl(AuthService, AssetService, $state){
+function ProfileCtrl(AuthService, AssetService, MapService, $state){
 	this.currentUser = AuthService.currentUser;
 	this.errors = AuthService.errors;
 	var that=this;
