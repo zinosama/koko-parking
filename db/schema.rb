@@ -11,6 +11,51 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 20160112143356) do
+
+  create_table "listings", force: :cascade do |t|
+    t.float    "lat",                          null: false
+    t.float    "lng",                          null: false
+    t.string   "address",                      null: false
+    t.string   "transit_info"
+    t.string   "rules"
+    t.string   "other_info"
+    t.boolean  "published",    default: false
+    t.boolean  "completed",    default: false
+    t.integer  "user_id",                      null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "listings", ["lat"], name: "index_listings_on_lat"
+  add_index "listings", ["lng"], name: "index_listings_on_lng"
+  add_index "listings", ["published"], name: "index_listings_on_published"
+
+  create_table "spots", force: :cascade do |t|
+    t.integer  "car_class"
+    t.integer  "spot_class"
+    t.integer  "d_price"
+    t.integer  "w_price"
+    t.integer  "m_price"
+    t.boolean  "instant",    default: false
+    t.boolean  "completed",  default: false
+    t.boolean  "published",  default: false
+    t.integer  "listing_id",                 null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "spots", ["car_class"], name: "index_spots_on_car_class"
+  add_index "spots", ["d_price"], name: "index_spots_on_d_price"
+  add_index "spots", ["instant"], name: "index_spots_on_instant"
+  add_index "spots", ["published"], name: "index_spots_on_published"
+
+  create_table "users", force: :cascade do |t|
+    t.string   "fire_ref",   null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "users", ["fire_ref"], name: "index_users_on_fire_ref"
 
 end

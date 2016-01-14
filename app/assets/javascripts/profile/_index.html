@@ -1,4 +1,29 @@
 <h1>Welcome, {{profile.currentUser}}</h1>
+<h3>Your Listings</h3>
+
+<dic class="row profileListingRow">
+	<div ng-repeat="listing in profile.listings">
+		<div class="clearfix" ng-if="$index % 3 === 0"></div>
+		<div class="col-sm-4 col-xs-12">
+			<div class="well">
+				<a ng-href="#/listings/{{listing.id}}/spots" class="">
+					<img ng-src="http://maps.googleapis.com/maps/api/staticmap?center={{listing.lat}},{{listing.lng}}&zoom=16&size=300x150&markers=color:blue%7C{{listing.lat}},{{listing.lng}}&key=AIzaSyDxHLukZRAg_4pD8Eq5anqxXv6hACDvlcg" class="img-responsive">
+					<p>
+						<div ng-show="listing.published" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Published</div>
+						<div ng-hide="listing.published" class="actionNeeded"><span class="glyphicon glyphicon-info-sign"></span> Not Published</div>
+					</p>
+					<p>
+						<div ng-show="listing.completed" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Ready</div>
+						<div ng-hide="listing.completed" class="actionNeeded"><span class="glyphicon glyphicon-exclamation-sign"></span> Action Needed</div>
+					</p>
+					<p>{{listing.address}}</p>
+				</a>
+			</div>
+		</div>
+	</div>
+</dic>
+
+
 <button class="btn btn-primary btn-block" ng-click="profile.toggle('#accountSettingDiv')" style="margin-bottom:1em;">Account Setting</button> 
 <div id="accountSettingDiv" class="hide">
 

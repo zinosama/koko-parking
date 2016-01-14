@@ -1,14 +1,25 @@
-function ListingCtrl(MapService){
+function ListingCtrl(MapService, AuthService, AssetService, $http, $state){
 	var that = this;
 	var map, addressInput;
 	this.create = function(){
 		var output = {
-			"address": addressInput.value,
-			"transitInfo": this.transitInfo,
-			"rule": this.rule,
-			"otherInfo": this.otherInfo
+			address: addressInput.value,
+			transit_info: this.transitInfo,
+			rules: this.rule,
+			other_info: this.otherInfo,
+			lat: MapService.coord.lat,
+			lng: MapService.coord.lng,
+			fire_ref: AuthService.getUid() 
 		};
-		console.log(output);	
+		$http.post('/listings.json', output)
+		.success(function(){
+			AssetService.loadListings();
+			$state.go("profile");
+			console.log("success");
+		})
+		.error(function(error){
+			console.error(error);
+		});
 	};
 
 	this.toggleDisplay = function(){
@@ -23,28 +34,32 @@ function ListingCtrl(MapService){
 		}
 	};
 
+	var addAutoComplete = function(){
+		return new google.maps.places.Autocomplete(addressInput);
+	};
+
+	var allowMapUpdate = function(autoComplete){
+		google.maps.event.addListener(autoComplete, 'place_changed', function(){
+			var geocoder = new google.maps.Geocoder();
+			MapService.geocodeAddress(geocoder, map, addressInput.value);
+		});
+	};
+
+	var adjustMap = function(){
+		MapService.appendMap();
+		map = MapService.getMap();
+		google.maps.event.trigger(map, 'resize');
+		map.setCenter(MapService.getLocation());
+		allowMapUpdate(addAutoComplete());
+	};
+
 	angular.element(document).ready(function(){
 		addressInput = document.getElementById('listingInput');
 		if(MapService.isMapReady()){
-			MapService.appendMap();
-
-			map = MapService.getMap();
-			google.maps.event.trigger(map, 'resize');
-			map.setCenter(MapService.getLocation());
+			adjustMap();
 		}else{
-			MapService.registerCallback(MapService.appendMap);
+			MapService.registerCallback(adjustMap);
 		}
-
-		if(map){
-			var autoComplete = new google.maps.places.Autocomplete(addressInput);
-
-			google.maps.event.addListener(autoComplete, 'place_changed', function(){
-				var geocoder = new google.maps.Geocoder();
-				MapService.geocodeAddress(geocoder, map, addressInput.value);
-			});
-		}
-
-
 	});
 
 }

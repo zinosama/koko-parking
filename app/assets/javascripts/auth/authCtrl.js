@@ -1,4 +1,4 @@
-function AuthCtrl($rootScope, $state, AuthService){
+function AuthCtrl($rootScope, $state, AuthService, MapService){
 	var that = this;
 	this.errors=AuthService.errors;
 

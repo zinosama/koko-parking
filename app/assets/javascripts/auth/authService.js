@@ -1,4 +1,4 @@
-function AuthService($firebaseAuth, $firebaseObject, $state){
+function AuthService($firebaseAuth, $firebaseObject, $state, $http){
 	var ref = new Firebase("https://kokoparking.firebaseio.com");
 	var auth = $firebaseAuth(ref);
 
@@ -23,6 +23,15 @@ function AuthService($firebaseAuth, $firebaseObject, $state){
 		var userObj = $firebaseObject(userRef);
 		userObj.$remove();
 	};
+
+	var newUserApi = function(data){
+		$http.post('/users.json', data)
+		.success(function(){
+		})
+		.error(function(error){
+			console.error(error);
+		});
+	}
 
 	auth.$onAuth(function(authData){
 		if(authData){
@@ -66,6 +75,9 @@ function AuthService($firebaseAuth, $firebaseObject, $state){
 		.then(function(userData){
 			AuthServiceObj.addUserName(newUser,userData.uid);
 			AuthServiceObj.login(newUser);
+
+			var data = {fire_ref: userData.uid};//storing the firebase user_id ref in rails' sql database
+			newUserApi(data);
 		})
 		.catch(function(error){
 			AuthServiceObj.errors=[];
@@ -81,10 +93,15 @@ function AuthService($firebaseAuth, $firebaseObject, $state){
 		});
 	};
 
+	AuthServiceObj.getUid = function(){
+		return currentUserUid;
+	}
+
 	AuthServiceObj.login = function(newUser){
 		auth.$authWithPassword(newUser)
 			.then(function(authData){
 				$state.go("home");
+				newUserApi({fire_ref: authData.uid}); //in case sql fails upon registration
 			})
 			.catch(function(error){
 				AuthServiceObj.errors=[];

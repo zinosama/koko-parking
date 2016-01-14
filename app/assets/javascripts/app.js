@@ -61,7 +61,7 @@ angular.module('koko', ['ui.router','templates','firebase'])
 		})
 		.state('newListing',{
 			url:'/newListing',
-			templateUrl:'listing/_newListing.html',
+			templateUrl:'listing/_new.html',
 			controller:'ListingCtrl',
 			controllerAs:'listing',
 			onEnter:['$state','AuthService',function($state, AuthService){
@@ -69,7 +69,14 @@ angular.module('koko', ['ui.router','templates','firebase'])
 					$state.go('home');
 				}
 			}]
+		})
+		.state('spots',{
+			url:'/listings/:listingId/spots',
+			templateUrl:'spot/_index.html',
+			controller:'SpotCtrl',
+			controllerAs:'spot'
 		});
+		;
 
 		$urlRouterProvider.otherwise('home');
 	}]);

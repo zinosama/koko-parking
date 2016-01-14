@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
   root to:'application#angular'
+
+  resources :users, only: [:create, :destroy]
+  resources :listings, only: [:create, :show, :destroy, :update, :index]
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

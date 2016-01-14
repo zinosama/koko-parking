@@ -1,0 +1,11 @@
+.profileListingRow a:hover{
+	text-decoration: none;
+}
+
+.actionNeeded{
+	color:#FF6565;
+}
+
+.actionCompleted{
+	color:#248C0D;
+}

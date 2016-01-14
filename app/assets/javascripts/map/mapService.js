@@ -85,6 +85,11 @@ function MapService($window){
 					map: map,
 					position: results[0].geometry.location
 				});
+
+				MapService.coord = {
+					lat: results[0].geometry.location.lat(),
+					lng: results[0].geometry.location.lng()
+				};
 			}else{
 				console.error(status);
 			}
@@ -96,4 +101,4 @@ function MapService($window){
 
 angular
 .module('koko')
-.factory('MapService',MapService);
+.factory('MapService',MapService);	
