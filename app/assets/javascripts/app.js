@@ -1,4 +1,4 @@
-angular.module('koko', ['ui.router','templates','firebase'])
+angular.module('koko', ['ui.router','templates','firebase','ngAnimate', 'ui.bootstrap'])
 .constant('ROOTURL','https://kokoparking.firebaseio.com')
 .config([
 	'$stateProvider',

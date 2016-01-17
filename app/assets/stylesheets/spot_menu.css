@@ -1,0 +1,18 @@
+.panel-default{
+	border-color:white;
+}
+.panel-heading{
+	padding:0;
+}
+.panel-group .panel + .panel {
+  margin-top: 0px;
+}
+.panel-heading {
+    margin-top: 5px;
+}
+
+.btn-group, .btn-group-vertical {
+  position: relative;
+  vertical-align: middle;
+  display:block;
+}

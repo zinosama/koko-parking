@@ -1,7 +1,9 @@
 //= require angular
+//= require angular-animate
 //= require angular-rails-templates
 //= require angular-ui-router
 //= require firebase
 //= require angularfire
 //= require sweetalert
+//= require angular-bootstrap
 //= require_tree .

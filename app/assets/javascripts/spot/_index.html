@@ -1,17 +1,118 @@
 <!-- <p>{{spot.listingId}}</p>
 {{spot.spots}} -->
-<div id="spotNumDiv">
+<div id="spotNumDiv" ng-hide="spot.spots.length">
 	<h1>How many vehicles will this listing provide space for?</h1>
 	<small>You can customize setting for each spot on the next screen.</small>
 	<div class="form-group">
 		<input type="text" class="form-control" ng-model="spot.spotNum">
 	</div>
 	<div class="form-group">
-		<button class="btn btn-block btn-default">Continue</button>
+		<button class="btn btn-block btn-default" ng-click="spot.createSpots()">Continue</button>
 	</div>
 </div>
 
-<div class="">
-	<div class="panel">
+<div id="spotList" ng-show="spot.spots.length">
+	<button class="btn btn-primary" ng-click="spot.createSpots(1)">New Spot</button>
+	<div class="panel panel-default" ng-repeat="spotObj in spot.spots" >
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-6">
+					<p>Vehicle Class: {{spotObj.car_class}}</p>
+					<p>Spot Type: {{spotObj.spot_class}}</p>
+					<p>Instant Booking? {{spotObj.instant}}</p>
+					<p>
+						<div ng-show="spotObj.completed" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Ready</div>
+						<div ng-hide="spotObj.completed" class="actionNeeded"><span class="glyphicon glyphicon-exclamation-sign"></span> Action Needed</div>
+					</p>
+					<p>
+						<div ng-show="spotObj.published" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Published</div>
+						<div ng-hide="spotObj.published" class="actionNeeded"><span class="glyphicon glyphicon-info-sign"></span> Not Published</div>
+					</p>
+				</div>
+				<div class="col-sm-6">
+					<p>Daily Price: {{(spotObj.d_price | currency) || "Unactivated"}}</p>
+					<p>Weekly Price:{{(spotObj.w_price | currency) || "Unactivated"}}</p>
+					<p>Monthly Price: {{(spotObj.m_price | currency) || "Unactivated"}}</p>
+					<button class="btn btn-danger" ng-click="spot.destroySpot(spotObj.id, $index)">Delete</button>
+				</div>
+			</div>
+			<button class="btn btn-block btn-primary" ng-click="spot.editSpot(spotObj)">Enter</button>
+		</div>
 	</div>
+</div>
+
+<div id="spotMenu" class="hide">
+	<button class="btn btn-success btn-block btn-lg">Save &amp; Return</button>	
+	<uib-accordion>
+		<uib-accordion-group is-open="spot.spotMenuSwitch">
+			<uib-accordion-heading>
+        <button class="btn btn-lg btn-primary btn-block" style="color:white;">Spot Type</button>
+			</uib-accordion-heading>
+				<div class="btn-group">
+					<label class="btn btn-default btn-block" ng-model="spot.spotSelected.spot_class" ng-repeat="menuItem in spot.spotMenu" uib-btn-radio="{{$index+1}}" ng-click="spot.closeAccordion('spot')">
+						<p>{{menuItem.type}}</p>
+						<p>{{menuItem.description}}</p>
+					</label>
+				</div>
+		</uib-accordion-group>
+
+		<uib-accordion-group is-open="spot.carMenuSwitch">
+			<uib-accordion-heading>
+        <button class="btn btn-lg btn-primary btn-block" style="color:white;">Vehicle Class</button>
+			</uib-accordion-heading>
+				<div class="btn-group">
+					<label class="btn btn-default btn-block" ng-model="spot.spotSelected.car_class" ng-repeat="menuItem in spot.carMenu" uib-btn-radio="{{$index+1}}" ng-click="spot.closeAccordion('car')">
+						<p>{{menuItem.type}}</p>
+						<p>{{menuItem.description}}</p>
+					</label>
+				</div>
+		</uib-accordion-group>
+
+		<uib-accordion-group>
+			<uib-accordion-heading>
+        <button class="btn btn-lg btn-primary btn-block" style="color:white;">Prices</button>
+			</uib-accordion-heading>
+				<button ng-repeat="menuItem in spot.priceMenu" class="btn btn-default btn-block" ng-click="spot.setPrice(menuItem.key)">
+					<p>{{menuItem.type}}</p>
+					<p>{{menuItem.description}}</p>
+					<p ng-show="spot.spotSelected[menuItem.key]">Current price: {{spot.spotSelected[menuItem.key]}}</p>
+				</button>
+		</uib-accordion-group>
+
+		<uib-accordion-group>
+			<uib-accordion-heading>
+        <button class="btn btn-lg btn-primary btn-block" style="color:white;">Blackout Dates</button>
+			</uib-accordion-heading>
+				<div class="row">
+					<div class="col-md-6">
+						<p>Starting Unavailability:</p>
+	          <p class="input-group">
+	            <input type="date" class="form-control" uib-datepicker-popup ng-model="spot.startDate" is-open="spot.cal1.opened" min-date="spot.minDate" max-date="spot.maxDate" ng-required="true" close-text="Close" />
+	            <span class="input-group-btn">
+	              <button type="button" class="btn btn-default" ng-click="spot.openCal1()"><i class="glyphicon glyphicon-calendar"></i></button>
+	            </span>
+	          </p>
+	        </div>
+					<div class="col-md-6">
+						<p>Ending Unavailability:</p>
+	          <p class="input-group">
+	            <input type="date" class="form-control" uib-datepicker-popup ng-model="spot.endDate" is-open="spot.cal2.opened" min-date="spot.minDate" max-date="spot.maxDate" ng-required="true" close-text="Close" />
+	            <span class="input-group-btn">
+	              <button type="button" class="btn btn-default" ng-click="spot.openCal2()"><i class="glyphicon glyphicon-calendar"></i></button>
+	            </span>
+	          </p>
+	        </div>
+        </div>
+        <button class="btn btn-warning btn-block" ng-click="spot.showTime();">Add Blackout</button>
+		</uib-accordion-group>
+
+		<uib-accordion-group>
+			<uib-accordion-heading>
+				<button class="btn btn-lg btn-block" ng-class="{'btn-warning': spot.spotSelected.instant, 'btn-primary': !spot.spotSelected.instant}" ng-click="spot.toggleInstant()" >
+					<span ng-hide="spot.spotSelected.instant">Enable Instant Booking</span>
+					<span ng-show="spot.spotSelected.instant">Disable Instant Booking</span>
+				</button>
+			</uib-accordion-heading>
+		</uib-accordion-group>
+	</uib-accordion>
 </div>
