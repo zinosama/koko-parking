@@ -6,5 +6,4 @@ For original project, please visit https://github.com/nyc-bobolinks-2015/drivewa
 Note:
 Files in this project are grouped by feature instead of file type. For application files, please look inside app/assets/javascripts
 
-Progress:
-Finished user system with firebase and angularjs 1/2/16
+This project is under active development.
