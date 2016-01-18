@@ -16,7 +16,7 @@ function AssetService(AuthService, $http){
 		};
 	}
 
-	var AssetService={};
+	var AssetService = {};
 
 	AssetService.loadSpots = function(listingId){
 		return $http.get('/listings/'+listingId+'/spots')
@@ -57,6 +57,50 @@ function AssetService(AuthService, $http){
 			}
 		}
 		return false;
+	};
+
+	AssetService.spotMenu = [{
+			type:"Driveway",
+			description:"this parking spot is part of my driveway"
+		},{
+			type:"Lawn",
+			description:"this parking spot is part of my lawn"
+		},{
+			type:"Street Side",
+			description:"I have a permit that allows renters to park on street side"
+		},{
+			type:"Permit",
+			description:"I have a permit that allows renters to park in nearby private facilities"
+		}];
+
+	AssetService.carMenu = [{
+			type:"Compact",
+			description:"ex. Chevy Spark, Toyota Yaris, Honda Civic, etc."
+		},{
+			type:"Full Size",
+			description:"ex. Chevy Malibu, Toyota Camery, Honda Accord, etc."
+		},{
+			type:"SUV",
+			description:"ex. Chevy Tahoe, Toyota RAV4, Honda CRV, etc."
+		}];
+
+	AssetService.priceMenu = [{
+			type:"Daily Price",
+			description:"set daily price for this parking spot",
+			key:"d_price"
+		},{
+			type:"Weekly",
+			description:"set weekly price for this parking spot",
+			key:"w_price"
+		},{
+			type:"Monthly",
+			description:"set monthly price for this parking spot",
+			key:"m_price"
+		}];
+
+	AssetService.infoHash = {
+		"car_class":['undefined', 'Compact & Smaller', 'Full-size & Smaller', 'SUV & Smaller'],
+		"spot_class":['undefined', 'Driveway', 'Lawn', 'Street Side', 'Permit']
 	};
 
 	return AssetService;

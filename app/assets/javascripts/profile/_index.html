@@ -1,60 +1,76 @@
 <h1>Welcome, {{profile.currentUser}}</h1>
-<h3>Your Listings</h3>
-
-<dic class="row profileListingRow">
-	<div ng-repeat="listing in profile.listings">
-		<div class="clearfix" ng-if="$index % 3 === 0"></div>
-		<div class="col-sm-4 col-xs-12">
-			<div class="well">
-				<a ng-href="#/listings/{{listing.id}}/spots" class="">
-					<img ng-src="http://maps.googleapis.com/maps/api/staticmap?center={{listing.lat}},{{listing.lng}}&zoom=16&size=300x150&markers=color:blue%7C{{listing.lat}},{{listing.lng}}&key=AIzaSyDxHLukZRAg_4pD8Eq5anqxXv6hACDvlcg" class="img-responsive">
-					<p>
-						<div ng-show="listing.published" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Published</div>
-						<div ng-hide="listing.published" class="actionNeeded"><span class="glyphicon glyphicon-info-sign"></span> Not Published</div>
-					</p>
-					<p>
-						<div ng-show="listing.completed" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Ready</div>
-						<div ng-hide="listing.completed" class="actionNeeded"><span class="glyphicon glyphicon-exclamation-sign"></span> Action Needed</div>
-					</p>
-					<p>{{listing.address}}</p>
-				</a>
+<uib-accordion>
+	<uib-accordion-group is-open="profile.statusListing">
+		<div class="row profileListingRow">
+			<uib-accordion-heading>
+				<button class="btn btn-lg btn-block btn-primary">Your Listings <span class="glyphicon pull-right" ng-class="{'glyphicon-chevron-right': !profile.statusListing, 'glyphicon-chevron-down': profile.statusListing}"></span></button>
+			</uib-accordion-heading>
+			<div ng-repeat="listing in profile.listings">
+				<div class="clearfix" ng-if="$index % 3 === 0"></div>
+				<div class="col-sm-4 col-xs-12">
+					<div class="well">
+						<a ng-href="#/listings/{{listing.id}}/spots" class="">
+							<img ng-src="http://maps.googleapis.com/maps/api/staticmap?center={{listing.lat}},{{listing.lng}}&zoom=16&size=300x150&markers=color:blue%7C{{listing.lat}},{{listing.lng}}&key=AIzaSyDxHLukZRAg_4pD8Eq5anqxXv6hACDvlcg" class="img-responsive">
+							<p>
+								<div ng-show="listing.published" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Published</div>
+								<div ng-hide="listing.published" class="actionNeeded"><span class="glyphicon glyphicon-info-sign"></span> Not Published</div>
+							</p>
+							<p>
+								<div ng-show="listing.completed" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Ready</div>
+								<div ng-hide="listing.completed" class="actionNeeded"><span class="glyphicon glyphicon-exclamation-sign"></span> Action Needed</div>
+							</p>
+							<p>{{listing.address}}</p>
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
-</dic>
+	</uib-accordion-group>
 
-
-<button class="btn btn-primary btn-block" ng-click="profile.toggle('#accountSettingDiv')" style="margin-bottom:1em;">Account Setting</button> 
-<div id="accountSettingDiv" class="hide">
-
-	<button class="btn btn-default btn-block" ng-click="profile.toggle('#changePasswordDiv')">Change Password</button>
-	<div id="changePasswordDiv" class="hide">
-		<div class="error" ng-repeat="error in profile.errors">
-		  <p>{{error}}</p>
-		</div>
-		<form ng-submit="profile.changePassword()">
-			<ng-include src="'profile/_changePasswordForm.html'"></ng-include>
-		</form>
-	</div>
-
-	<button class="btn btn-default btn-block" ng-click="profile.toggle('#changeEmailDiv')">Change Email</button>
-	<div id="changeEmailDiv" class="hide">
-		<div class="error" ng-repeat="error in profile.errors">
-		  <p>{{error}}</p>
-		</div>
-		<form ng-submit="profile.changeEmail()">
-			<ng-include src="'profile/_changeEmailForm.html'"></ng-include>
-		</form>
-	</div>
-
-	<button class="btn btn-danger btn-block" ng-click="profile.toggle('#removeUserDiv')">Delete Account</button>
-	<div id="removeUserDiv" class="hide">
-		<div class="error" ng-repeat="error in profile.errors">
-		  <p>{{error}}</p>
-		</div>
-		<form ng-submit="profile.removeUser()">
-			<ng-include src="'profile/_removeUserForm.html'"></ng-include>
-		</form>
-	</div>
-</div>
-	
+	<uib-accordion-group is-open="profile.statusAS">
+		<uib-accordion-heading>
+			<button class="btn btn-primary btn-lg btn-block">Account Setting <span class="glyphicon pull-right" ng-class="{'glyphicon-chevron-right': !profile.statusAS, 'glyphicon-chevron-down': profile.statusAS}"></span></button> 
+		</uib-accordion-heading>
+			<uib-accordion>
+				<uib-accordion-group is-open="profile.statusCP">
+					<uib-accordion-heading>
+						<button class="btn btn-default btn-md btn-block">Change Password <span class="glyphicon pull-right" ng-class="{'glyphicon-chevron-right': !profile.statusCP, 'glyphicon-chevron-down': profile.statusCP}"></button>
+					</uib-accordion-heading>
+					<div id="changePasswordDiv">
+						<div class="error" ng-repeat="error in profile.errors">
+						  <p>{{error}}</p>
+						</div>
+						<form ng-submit="profile.changePassword()">
+							<ng-include src="'profile/_changePasswordForm.html'"></ng-include>
+						</form>
+					</div>
+				</uib-accordion-group>
+				<uib-accordion-group is-open="profile.statusCE">
+					<uib-accordion-heading>
+						<button class="btn btn-default btn-md btn-block">Change Email <span class="glyphicon pull-right" ng-class="{'glyphicon-chevron-right': !profile.statusCE, 'glyphicon-chevron-down': profile.statusCE}"></button>
+					</uib-accordion-heading>
+					<div id="changeEmailDiv">
+						<div class="error" ng-repeat="error in profile.errors">
+						  <p>{{error}}</p>
+						</div>
+						<form ng-submit="profile.changeEmail()">
+							<ng-include src="'profile/_changeEmailForm.html'"></ng-include>
+						</form>
+					</div>
+				</uib-accordion-group>
+				<uib-accordion-group is-open="profile.statusDA">
+					<uib-accordion-heading>
+						<button class="btn btn-danger btn-md btn-block">Delete Account <span class="glyphicon pull-right" ng-class="{'glyphicon-chevron-right': !profile.statusDA, 'glyphicon-chevron-down': profile.statusDA}"></button>
+					</uib-accordion-heading>
+					<div id="removeUserDiv">
+						<div class="error" ng-repeat="error in profile.errors">
+						  <p>{{error}}</p>
+						</div>
+						<form ng-submit="profile.removeUser()">
+							<ng-include src="'profile/_removeUserForm.html'"></ng-include>
+						</form>
+					</div>
+				</uib-accordion-group>
+			</uib-accordion>
+	</uib-accordion-group>
+</uib-accordion>

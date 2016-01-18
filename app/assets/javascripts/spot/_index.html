@@ -12,14 +12,21 @@
 </div>
 
 <div id="spotList" ng-show="spot.spots.length">
-	<button class="btn btn-primary" ng-click="spot.createSpots(1)">New Spot</button>
+	<div class="row">
+		<div class="col-sm-10">
+			<p id="spotListTitle">Parking Spots on This Listing</p>
+		</div>
+		<div class="col-sm-2">
+			<button class="btn btn-primary btn-block" id="newSpotButton" ng-click="spot.createSpots(1)">New Spot</button>
+		</div>
+	</div>
 	<div class="panel panel-default" ng-repeat="spotObj in spot.spots" >
 		<div class="panel-body">
 			<div class="row">
-				<div class="col-sm-6">
-					<p>Vehicle Class: {{spotObj.car_class}}</p>
-					<p>Spot Type: {{spotObj.spot_class}}</p>
-					<p>Instant Booking? {{spotObj.instant}}</p>
+				<div class="col-sm-6" style="text-align:center;">
+					<p>Vehicle Class: {{spot.infoTransform(spotObj.car_class,"car_class")}}</p>
+					<p>Spot Type: {{spot.infoTransform(spotObj.spot_class,"spot_class")}}</p>
+					<p>Instant Booking: <span class="glyphicon" ng-class="{'glyphicon-ok-circle truthySymbol':spotObj.instant, 'glyphicon-remove-circle falsySymbol': !spotObj.instant}"></span></p>
 					<p>
 						<div ng-show="spotObj.completed" class="actionCompleted"><span class="glyphicon glyphicon-ok-sign"></span> Ready</div>
 						<div ng-hide="spotObj.completed" class="actionNeeded"><span class="glyphicon glyphicon-exclamation-sign"></span> Action Needed</div>
@@ -29,20 +36,34 @@
 						<div ng-hide="spotObj.published" class="actionNeeded"><span class="glyphicon glyphicon-info-sign"></span> Not Published</div>
 					</p>
 				</div>
-				<div class="col-sm-6">
+				<div class="col-sm-6" style="text-align: center;">
 					<p>Daily Price: {{(spotObj.d_price | currency) || "Unactivated"}}</p>
-					<p>Weekly Price:{{(spotObj.w_price | currency) || "Unactivated"}}</p>
+					<p>Weekly Price: {{(spotObj.w_price | currency) || "Unactivated"}}</p>
 					<p>Monthly Price: {{(spotObj.m_price | currency) || "Unactivated"}}</p>
-					<button class="btn btn-danger" ng-click="spot.destroySpot(spotObj.id, $index)">Delete</button>
+					<div class="row">
+						<div class="col-sm-offset-4 col-sm-4 col-xs-offset-3 col-xs-6" ng-show="spotObj.completed && spotObj.published">
+							<button class="btn btn-warning btn-block profileMdButton" ng-click="spot.suspendSpot(spotObj)">Suspend</button>
+						</div>
+						<div class="col-sm-offset-4 col-sm-4 col-xs-offset-3 col-xs-6 profileMdButton" ng-show="spotObj.completed && !spotObj.published">
+							<button class="btn btn-success btn-block" ng-click="spot.publishSpot(spotObj)">Publish</button>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-offset-4 col-sm-4 col-xs-offset-3 col-xs-6">
+							<button class="btn btn-danger btn-block profileMdButton" ng-click="spot.destroySpot(spotObj.id, $index)">Delete</button>
+						</div>
+					</div>
 				</div>
 			</div>
-			<button class="btn btn-block btn-primary" ng-click="spot.editSpot(spotObj)">Enter</button>
+			<div class="col-sm-offset-3 col-sm-6">
+				<button class="btn btn-block btn-primary btn-lg" ng-click="spot.editSpot(spotObj)">Enter</button>
+			</div>
 		</div>
 	</div>
 </div>
 
 <div id="spotMenu" class="hide">
-	<button class="btn btn-success btn-block btn-lg">Save &amp; Return</button>	
+	<button class="btn btn-success btn-block btn-lg" ng-click="spot.saveNReturn()">Save &amp; Return</button>	
 	<uib-accordion>
 		<uib-accordion-group is-open="spot.spotMenuSwitch">
 			<uib-accordion-heading>
@@ -84,6 +105,7 @@
         <button class="btn btn-lg btn-primary btn-block" style="color:white;">Blackout Dates</button>
 			</uib-accordion-heading>
 				<div class="row">
+					<p ng-show="spot.slotError" style="color:red;">{{spot.slotError}}</p>
 					<div class="col-md-6">
 						<p>Starting Unavailability:</p>
 	          <p class="input-group">
@@ -103,7 +125,13 @@
 	          </p>
 	        </div>
         </div>
-        <button class="btn btn-warning btn-block" ng-click="spot.showTime();">Add Blackout</button>
+        <button class="btn btn-warning btn-block" ng-click="spot.addSlot();">Add Blackout</button>
+        <div class="panel panel-default" ng-repeat="slot in spot.selectedSlots" id="timeSlot">
+        	<div class="panel-body">
+        	<button class="btn btn-sm btn-primary pull-right" style="position:float;" ng-click="spot.removeSlot(slot, $index)">Remove</button>
+        		<p><span class="glyphicon glyphicon-remove-circle"></span> {{slot.start_time | date:format:fullDate}} - {{slot.end_time | date:format:fullDate}}</p>
+        	</div>
+        </div>
 		</uib-accordion-group>
 
 		<uib-accordion-group>

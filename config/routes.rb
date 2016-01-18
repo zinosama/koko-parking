@@ -6,8 +6,11 @@ Rails.application.routes.draw do
     resources :spots, only: [:index]
   end
 
-  resources :spots, only: [:create, :show, :destroy, :update]
+  resources :spots, only: [:create, :show, :destroy, :update] do
+    resources :slots, only: [:index]
+  end
 
+  resources :slots, only: [:create, :destroy] 
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

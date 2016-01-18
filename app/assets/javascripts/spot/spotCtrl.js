@@ -1,43 +1,31 @@
-function SpotCtrl($stateParams, $http, MapService, spots, $scope){
+function SpotCtrl($stateParams, $http, MapService, AssetService, spots, $scope){
 	var that = this;
+	var infoHash = AssetService.infoHash;
+	
+	function loadSlots(){
+		$http.get('/spots/'+that.spotSelected.id+'/slots')
+		.success(function(data){
+			that.selectedSlots = data.slots;
+		})
+		.error(function(error){
+			console.error(error.errors);
+		});
+	};
+
+	function toggle(target){
+		var el = document.querySelector(target);
+		if(el.classList.contains('hide')){
+			el.classList.remove('hide');
+		}else{
+			el.classList.add('hide');
+		}
+	};
+
 	this.spotMenuSwitch = false;
-	this.spotMenu=[{
-			type:"Driveway",
-			description:"this parking spot is part of my driveway"
-		},{
-			type:"Lawn",
-			description:"this parking spot is part of my lawn"
-		},{
-			type:"Street Side",
-			description:"I have a permit that allows renters to park on street side"
-		},{
-			type:"Permit",
-			description:"I have a permit that allows renters to park in nearby private facilities"
-		}];
+	this.spotMenu = AssetService.spotMenu;
 	this.carMenuSwitch = false;
-	this.carMenu=[{
-			type:"Compact",
-			description:"ex. Chevy Spark, Toyota Yaris, Honda Civic, etc."
-		},{
-			type:"Full Size",
-			description:"ex. Chevy Malibu, Toyota Camery, Honda Accord, etc."
-		},{
-			type:"SUV",
-			description:"ex. Chevy Tahoe, Toyota RAV4, Honda CRV, etc."
-		}];
-	this.priceMenu=[{
-			type:"Daily Price",
-			description:"set daily price for this parking spot",
-			key:"d_price"
-		},{
-			type:"Weekly",
-			description:"set weekly price for this parking spot",
-			key:"w_price"
-		},{
-			type:"Monthly",
-			description:"set monthly price for this parking spot",
-			key:"m_price"
-		}];
+	this.carMenu = AssetService.carMenu;
+	this.priceMenu= AssetService.priceMenu;
 
 	this.minDate = new Date();
 	this.maxDate = new Date();
@@ -50,24 +38,45 @@ function SpotCtrl($stateParams, $http, MapService, spots, $scope){
 	this.openCal2 = function(){
 		that.cal2.opened = true;
 	}
-	this.showTime = function(){
-		console.log(that.startDate);
-		console.log(typeof that.startDate);
-	};
 
 	this.spots = spots;
+	this.slotError;
 	this.spotSelected;
-	this.toggleInstant = function(){
-		that.spotSelected.instant = !that.spotSelected.instant;
+	this.selectedSlots;
+
+	this.addSlot = function(){
+		that.slotError="";
+		if(that.startDate > that.endDate){
+			that.slotError = "Sorry, ending date cannot be earlier than starting date.";
+		}else{
+			var data={
+				start_time: that.startDate,
+				end_time: that.endDate,
+				spot_id: that.spotSelected.id,
+				unavailable: true
+			};
+			$http.post('/slots',data)
+			.success(function(result){
+				that.selectedSlots.push(result.slot);
+			})
+			.error(function(error){
+				console.error(error.errors);
+			});
+		}
 	};
 
-	function toggle(target){
-		var el = document.querySelector(target);
-		if(el.classList.contains('hide')){
-			el.classList.remove('hide');
-		}else{
-			el.classList.add('hide');
-		}
+	this.removeSlot = function(slot, index){
+		$http.delete('/slots/'+slot.id)
+		.success(function(){
+			that.selectedSlots.splice(index, 1);
+		})
+		.error(function(error){
+			console.error(error.errors);
+		});
+	};
+
+	this.toggleInstant = function(){
+		that.spotSelected.instant = !that.spotSelected.instant;
 	};
 
 	this.closeAccordion = function(target){
@@ -123,9 +132,9 @@ function SpotCtrl($stateParams, $http, MapService, spots, $scope){
 		$http.post('/spots', postData)
 		.success(function(data){
 			if(inputNum){
-				that.spots.push(data.newSpotIndices);
+				that.spots.push(data.newSpots[0]);
 			}else{
-				that.spots = data.newSpotIndices;
+				that.spots = data.newSpots;
 			}
 		})
 		.error(function(error){
@@ -134,22 +143,96 @@ function SpotCtrl($stateParams, $http, MapService, spots, $scope){
 	};
 
 	this.destroySpot = function(spotId, index){
-		$http.delete('/spots/'+spotId)
-		.success(function(){
-			that.spots.splice(index, 1);
-		})
-		.error(function(error){
-			console.error(error);
+		swal({title: "Are you sure?",
+			text: "You may be financially liable for renters who have already rented this spot!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "Yes, delete it!",
+			closeOnConfirm: false
+		}, function(){
+			$http.delete('/spots/'+spotId)
+			.success(function(){
+				that.spots.splice(index, 1);
+				swal("Deleted!", "Your information has been updated.", "success");
+			})
+			.error(function(error){
+				console.error(error);
+			});
 		});
 	};	
-
-
 
 	this.editSpot = function(targetSpot){
 		toggle('#spotList');
 		that.spotSelected = targetSpot;
-
 		toggle('#spotMenu');
+		loadSlots();
+	};
+
+	this.publishSpot = function(spot){
+		$http.put('/spots/'+spot.id, {published: true})
+		.success(function(){
+			spot.published = true;
+			swal({
+				title: "Congratulations!",
+				text: "Your parking spot is now available online.",
+				timer: 2000,
+				type:"success",
+				showConfirmButton: true
+			});
+		})
+		.error(function(error){
+			console.error(error);
+		});
+	};
+
+	this.suspendSpot = function(spot){
+		swal({
+			title: "Are you sure?",
+			text: "Your parking spot will no longer be available online!",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "Yes, take it off-line!",
+			closeOnConfirm: false
+		}, function(){
+			$http.put('/spots/'+spot.id, {published: false})
+			.success(function(){
+				spot.published = false;
+				swal({
+					title: "Suspended!",
+					text: "This parking spot is now off-line.",
+					type: "success",
+					timer: 1200,
+					showConfirmButton: false
+				});
+			})
+			.error(function(error){
+				console.error(error);
+			});
+		});
+	};
+
+	this.infoTransform = function(info, type){
+		return infoHash[type][parseInt(info, 10)];
+	};
+
+	this.saveNReturn = function(){
+		if(that.spotSelected){
+			if(!that.spotSelected.completed){
+				if(that.spotSelected.car_class && that.spotSelected.spot_class && (that.spotSelected.d_price || that.spotSelected.w_price || that.spotSelected.m_price)){
+					that.spotSelected.completed = true;
+				}
+			}
+			$http.put('/spots/'+that.spotSelected.id, that.spotSelected)
+			.success(function(){
+				toggle('#spotMenu');
+				toggle('#spotList');
+			})
+			.error(function(error){
+				console.error(error);
+			});
+		}
 	};
 };
 

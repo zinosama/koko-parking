@@ -9,3 +9,12 @@
 .actionCompleted{
 	color:#248C0D;
 }
+.truthySymbol{
+	color:#449d44;
+}
+.falsySymbol{
+	color:#FF6565;
+}
+.profileMdButton{
+	margin-bottom: 0.8em;
+}

@@ -1,4 +1,4 @@
-.panel-default{
+.panel-group .panel-default{
 	border-color:white;
 }
 .panel-heading{
@@ -15,4 +15,23 @@
   position: relative;
   vertical-align: middle;
   display:block;
+}
+
+#timeSlot{
+	padding-top:0.4em;
+	border-color: #ccc;
+	margin-top:0.5em;
+	vertical-align: center;
+	text-align: center;
+}
+#newSpotButton{
+	margin-top: 1.4em;
+}
+#spotListTitle{
+	font-family: 'Roboto Slab', serif;
+	font-size:1.5em;
+	vertical-align: middle;
+	font-weight: 600;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
 }

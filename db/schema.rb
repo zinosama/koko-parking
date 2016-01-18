@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160112143356) do
+ActiveRecord::Schema.define(version: 20160117150201) do
+
+  create_table "bookings", force: :cascade do |t|
+    t.float    "total",      null: false
+    t.integer  "listing_id", null: false
+    t.integer  "user_id",    null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "listings", force: :cascade do |t|
     t.float    "lat",                          null: false
@@ -30,6 +38,17 @@ ActiveRecord::Schema.define(version: 20160112143356) do
   add_index "listings", ["lat"], name: "index_listings_on_lat"
   add_index "listings", ["lng"], name: "index_listings_on_lng"
   add_index "listings", ["published"], name: "index_listings_on_published"
+
+  create_table "slots", force: :cascade do |t|
+    t.boolean  "booked",      default: false
+    t.boolean  "unavailable", default: false
+    t.date     "start_time"
+    t.date     "end_time"
+    t.integer  "spot_id",                     null: false
+    t.integer  "booking_id"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
 
   create_table "spots", force: :cascade do |t|
     t.integer  "car_class"

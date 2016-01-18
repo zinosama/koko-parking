@@ -13,20 +13,20 @@ class SpotsController < ApplicationController
 		listing = Listing.find_by(id:params[:listing_id])
 		if listing
 			spotNum = params[:spot_num].to_i
-			newSpotIndices = []
+			newSpots = []
 			error = ""
 
 			spotNum.times do
 				spot = listing.spots.build()
 				if spot.save
-					newSpotIndices.push(spot)
+					newSpots.push(spot)
 				else
 					error = spot.errors.full_messages
 				end
 			end
 			
 			if error == ""
-				render json:{newSpotIndices: newSpotIndices}, status: 200
+				render json:{newSpots: newSpots}, status: 200
 			else
 				render json:{errors: error}, status: 500
 			end
@@ -41,7 +41,16 @@ class SpotsController < ApplicationController
 
 
 	def update
-
+		spot = Spot.find_by(id: params[:id])
+		if spot
+			if spot.update(spot_params)
+				render nothing: true
+			else
+				render json: {errors: spot.errors.full_messages}, status:500
+			end
+		else
+			render json: {errors: "Error loading parking spot."}, status: 500
+		end
 	end
 
 	def destroy
@@ -52,6 +61,10 @@ class SpotsController < ApplicationController
 		else
 			render json: {errors: spot.errors.full_messages}, status: 500
 		end
+	end
+
+	def spot_params
+		params.permit(:car_class, :spot_class, :d_price, :w_price, :m_price, :instant, :completed, :published)
 	end
 
 end

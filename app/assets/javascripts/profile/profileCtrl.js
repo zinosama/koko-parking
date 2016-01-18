@@ -1,6 +1,7 @@
 function ProfileCtrl(AuthService, AssetService, MapService, $state){
 	this.currentUser = AuthService.currentUser;
 	this.errors = AuthService.errors;
+	this.statusListing = true;
 	var that=this;
 
 	var updateCurrentUser = function profileUserObserver(){
@@ -18,9 +19,7 @@ function ProfileCtrl(AuthService, AssetService, MapService, $state){
 		that.listings = AssetService.getListings();
 	};
 	AssetService.registerCallback(updateListing);
-
 	//==asset
-
 
 	var afterSuccess = function(target){ 
 		return function(){
